@@ -1,9 +1,9 @@
-module RackyDacks
-  module Jobs
-    class Pageview
-      include SuckerPunch::Job
+require "racky_dacks/handlers/ga"
 
-      def perform(tracker, params = {})
+module RackyDacks
+  module Handlers
+    class Pageview < GA
+      def call(params = {})
         tracker.pageview(
           document_location: params[:location],
           document_title: params[:title],
