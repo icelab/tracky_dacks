@@ -7,13 +7,17 @@ require "racky_dacks/job"
 
 module RackyDacks
   module Plugin
-    IMAGE_DATA = Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVQYV2NgYAAAAAMAAWgmWQ0AAAAASUVORK5CYII=").freeze
+    IMAGE_PATH = File.join(__dir__, "..", "..", "public", "image.png").freeze
 
     DEFAULT_HANDLERS = {
       event:    Handlers::Event,
       pageview: Handlers::Pageview,
       social:   Handlers::Social,
     }.freeze
+
+    def self.load_dependencies(app, *)
+      app.plugin :sinatra_helpers
+    end
 
     def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {})
       plugin_opts = app.opts[:racky_dacks] = {}
@@ -33,9 +37,7 @@ module RackyDacks
               roda_class.opts[:racky_dacks][:runner].(handler, params)
 
               if format == "png"
-                response["Content-Type"] = "image/png"
-                response["Content-Disposition"] = "inline"
-                halt response.finish_with_body IMAGE_DATA
+                send_file IMAGE_PATH, disposition: "inline"
               else
                 redirect params["target"]
               end
