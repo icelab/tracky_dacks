@@ -1,5 +1,4 @@
 require "base64"
-require "staccato"
 require "racky_dacks/handlers/event"
 require "racky_dacks/handlers/pageview"
 require "racky_dacks/handlers/social"

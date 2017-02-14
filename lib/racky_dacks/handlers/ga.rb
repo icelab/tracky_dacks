@@ -1,3 +1,5 @@
+require "staccato"
+
 module RackyDacks
   module Handlers
     class GA
