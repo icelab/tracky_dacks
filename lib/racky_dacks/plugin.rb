@@ -35,7 +35,7 @@ module RackyDacks
               if format == "png"
                 response["Content-Type"] = "image/png"
                 response["Content-Disposition"] = "inline"
-                response.finish_with_body IMAGE_DATA
+                halt response.finish_with_body IMAGE_DATA
               else
                 redirect params[:target]
               end
