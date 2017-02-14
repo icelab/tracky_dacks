@@ -37,7 +37,7 @@ module RackyDacks
                 response["Content-Disposition"] = "inline"
                 halt response.finish_with_body IMAGE_DATA
               else
-                redirect params[:target]
+                redirect params["target"]
               end
             end
           end

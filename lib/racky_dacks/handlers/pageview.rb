@@ -5,10 +5,10 @@ module RackyDacks
     class Pageview < GA
       def call(params = {})
         tracker.pageview(
-          document_location: params[:location],
-          document_title: params[:title],
-          document_path: params[:path],
-          campaign_id: params[:campaign_id],
+          document_location: params["location"],
+          document_title: params["title"],
+          document_path: params["path"],
+          campaign_id: params["campaign_id"],
         )
       end
     end
