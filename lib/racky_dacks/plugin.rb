@@ -38,7 +38,8 @@ module RackyDacks
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"
               else
-                redirect params["target"]
+                status_code = Integer(params.fetch("redirect", 302))
+                redirect params["target"], status_code
               end
             end
           end
