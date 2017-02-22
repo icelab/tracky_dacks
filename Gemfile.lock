@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-   tracky_dacks (0.1.0)
+    tracky_dacks (0.1.0)
       roda
       staccato
       sucker_punch
@@ -39,9 +39,9 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.14)
   byebug
- tracky_dacks!
   rake (~> 10.0)
   rspec (~> 3.0)
+  tracky_dacks!
 
 BUNDLED WITH
    1.14.3
