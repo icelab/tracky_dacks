@@ -1,24 +1,57 @@
 # Tracky Dacks
 
+Tracky Dacks provides non-intrusive, server-side Google Analytics tracking and redirects. It's implemented as a Roda plugin, which makes it easy to turn into a simple Rack mountable app.
+
+Tracky Dacks accepts 3 different types of tracking events:
+
+- Page views (`/pageview`)
+- Social events (`/social`)
+- Events (`/event`)
+
+Each of these has its own endpoint. For each request, it will enqueue a background job (in-process, using [SuckerPunch](https://github.com/brandonhilkert/sucker_punch)) to record the event with Google Analytics, and then either redirect or return an empty image (if a `.png` extension is provided on the request path).
+
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem tracky_dacks'
+gem "tracky_dacks"
 ```
 
 And then execute:
 
-    $ bundle
+```sh
+$ bundle
+```
 
-Or install it yourself as:
+Or install it yourself:
 
-    $ gem installtracky_dacks
+```sh
+$ gem install tracky_dacks
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+To create a standalone tracker app, first create a Roda app, then enable the plugin (with your Google Analytics configuration) and its routes:
+
+```ruby
+class MyTracker < Roda
+  plugin :tracky_dacks, handler_options: {tracking_id: "abc"}
+
+  route do |r|
+    r.tracky_dacks_routes
+  end
+end
+```
+
+You can then run this as a standalone rackup with a `config.ru` like the following:
+
+```ruby
+require "my_tracker" # path to the file with your app
+run MyTracker.freeze.app
+```
+
+You can also mount this app within another Rack app, or even use the plugin directly from another Roda app.
 
 ## Development
 
@@ -28,7 +61,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/Tim Rileytracky_dacks. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome [on GitHub](https://github.com/icelab/tracky_dacks). This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
