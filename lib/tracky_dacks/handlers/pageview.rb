@@ -8,6 +8,7 @@ module TrackyDacks
           document_location: params["location"],
           document_title: params["title"],
           document_path: params["path"],
+          referrer: params["referrer"],
           campaign_id: params["campaign_id"],
         )
       end

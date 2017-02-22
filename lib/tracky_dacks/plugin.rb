@@ -33,7 +33,10 @@ module TrackyDacks
         get do
           roda_class.opts[:tracky_dacks][:handlers].each_pair do |key, handler|
             on /#{key}\.?(\w+)?/ do |format|
-              roda_class.opts[:tracky_dacks][:runner].(handler, params)
+              roda_class.opts[:tracky_dacks][:runner].(
+                handler,
+                params.merge("referrer": referrer)
+              )
 
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"
