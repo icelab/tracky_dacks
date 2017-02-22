@@ -1,6 +1,6 @@
 require "staccato"
 
-module RackyDacks
+module TrackyDacks
   module Handlers
     class GA
       attr_reader :tracker

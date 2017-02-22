@@ -1,6 +1,6 @@
-require "racky_dacks/handlers/ga"
+require "tracky_dacks/handlers/ga"
 
-module RackyDacks
+module TrackyDacks
   module Handlers
     class Pageview < GA
       def call(params = {})

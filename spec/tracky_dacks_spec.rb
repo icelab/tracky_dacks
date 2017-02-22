@@ -1,14 +1,14 @@
 require "spec_helper"
-require "racky_dacks/app"
-require "racky_dacks/job"
+require "tracky_dacks/app"
+require "tracky_dacks/job"
 
 
-RSpec.describe "RackyDacks" do
+RSpec.describe "TrackyDacks" do
   let(:runner) { spy("runner") }
 
   it "works" do
-    roda_app = RackyDacks::App
-    roda_app.opts[:racky_dacks][:runner] = runner # Pass runner directly so we can test it gets called
+    roda_app = TrackyDacks::App
+    roda_app.opts[:tracky_dacks][:runner] = runner # Pass runner directly so we can test it gets called
     app = roda_app.app
 
     env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/social", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}

@@ -1,3 +1,3 @@
-require "racky_dacks/app"
+require "tracky_dacks/app"
 
-run RackyDacks::App.freeze.app
+run TrackyDacks::App.freeze.app

@@ -1,10 +1,10 @@
 require "base64"
-require "racky_dacks/handlers/event"
-require "racky_dacks/handlers/pageview"
-require "racky_dacks/handlers/social"
-require "racky_dacks/job"
+require "tracky_dacks/handlers/event"
+require "tracky_dacks/handlers/pageview"
+require "tracky_dacks/handlers/social"
+require "tracky_dacks/job"
 
-module RackyDacks
+module TrackyDacks
   module Plugin
     IMAGE_PATH = File.join(__dir__, "..", "..", "public", "image.png").freeze
 
@@ -19,7 +19,7 @@ module RackyDacks
     end
 
     def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {})
-      plugin_opts = app.opts[:racky_dacks] = {}
+      plugin_opts = app.opts[:tracky_dacks] = {}
 
       plugin_opts[:runner] = runner
 
@@ -29,11 +29,11 @@ module RackyDacks
     end
 
     module RequestMethods
-      def racky_dacks_routes
+      def tracky_dacks_routes
         get do
-          roda_class.opts[:racky_dacks][:handlers].each_pair do |key, handler|
+          roda_class.opts[:tracky_dacks][:handlers].each_pair do |key, handler|
             on /#{key}\.?(\w+)?/ do |format|
-              roda_class.opts[:racky_dacks][:runner].(handler, params)
+              roda_class.opts[:tracky_dacks][:runner].(handler, params)
 
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"

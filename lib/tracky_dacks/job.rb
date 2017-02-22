@@ -1,6 +1,6 @@
 require "sucker_punch"
 
-module RackyDacks
+module TrackyDacks
   class Job
     include SuckerPunch::Job
 
