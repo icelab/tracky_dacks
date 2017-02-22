@@ -4,7 +4,7 @@ require "roda"
 RSpec.describe "TrackyDacks" do
   let(:runner) { spy("runner") }
 
-  let(:app_class) {
+  let(:app) {
     Class.new(Roda) do
       plugin :tracky_dacks, handler_options: {tracking_id: "abc"}
 
@@ -14,12 +14,16 @@ RSpec.describe "TrackyDacks" do
     end
   }
 
-  it "tracks requests passed to a Roda app" do
-    app_class.opts[:tracky_dacks][:runner] = runner # Pass runner directly so we can verify it gets called
-    app = app_class.app
+  let(:rack_app) { app.app }
 
+  before do
+    # Pass a runner spy so we can verify calls
+    app.opts[:tracky_dacks][:runner] = runner
+  end
+
+  it "tracks requests passed to a Roda app" do
     env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/social", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
-    response = app.(env)
+    response = rack_app.(env)
 
     expect(response.first).to eq 302
     expect(runner).to have_received(:call)
