@@ -9,7 +9,12 @@ module TrackyDacks
           document_title: params["title"],
           document_path: params["path"],
           referrer: params["referrer"],
-          campaign_id: params["campaign_id"],
+          campaign_name: params["campaign_name"],
+          campaign_source: params["campaign_source"] || params["referrer"],
+          campaign_medium: params["campaign_medium"],
+          campaign_keyword: params["campaign_keyword"],
+          campaign_content: params["campaign_content"],
+          campaign_id: params["campaign_id"]
         )
       end
     end
