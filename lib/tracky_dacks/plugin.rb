@@ -35,7 +35,7 @@ module TrackyDacks
             on /#{key}\.?(\w+)?/ do |format|
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
-                params.merge("referrer": referrer)
+                params.merge("referrer" => referrer)
               )
 
               if format == "png"
