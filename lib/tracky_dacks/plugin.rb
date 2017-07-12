@@ -22,17 +22,17 @@ module TrackyDacks
       plugin_opts = app.opts[:tracky_dacks] = {}
 
       plugin_opts[:runner] = runner
-
-      plugin_opts[:handlers] = handlers.each_with_object({}) { |(key, handler_class), result|
-        result[key] = handler_class.new(handler_options)
-      }
+      plugin_opts[:handlers] = handlers
+      plugin_opts[:handler_options] = handler_options
     end
 
     module RequestMethods
-      def tracky_dacks_routes
+      def tracky_dacks_routes(**handler_options)
         get do
-          roda_class.opts[:tracky_dacks][:handlers].each_pair do |key, handler|
+          roda_class.opts[:tracky_dacks][:handlers].each_pair do |key, handler_class|
             on /#{key}\.?(\w+)?/ do |format|
+              handler = handler_class.new(roda_class.opts[:tracky_dacks][:handler_options].merge(handler_options))
+
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
                 params.merge("referrer": referrer)
