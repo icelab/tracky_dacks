@@ -40,9 +40,14 @@ module TrackyDacks
 
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"
-              else
+              elsif params["target"]
                 status_code = Integer(params.fetch("redirect", 302))
                 redirect params["target"], status_code
+              else
+                halt [200, {
+                  "Content-Type" => "text/html",
+                  "Access-Control-Allow-Origin" => "*"
+                  }, []]
               end
             end
           end
