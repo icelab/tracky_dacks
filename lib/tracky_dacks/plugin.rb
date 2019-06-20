@@ -28,7 +28,7 @@ module TrackyDacks
 
     module RequestMethods
       def tracky_dacks_routes(**handler_options)
-        get do
+        on method: ['GET', 'HEAD'] do
           roda_class.opts[:tracky_dacks][:handlers].each_pair do |key, handler_class|
             on /#{key}\.?(\w+)?/ do |format|
               handler = handler_class.new(roda_class.opts[:tracky_dacks][:handler_options].merge(handler_options))
