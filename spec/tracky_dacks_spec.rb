@@ -22,10 +22,11 @@ RSpec.describe "TrackyDacks" do
   end
 
   it "tracks requests passed to a Roda app" do
-    env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/social", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
+    env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/social", "QUERY_STRING" => "target=/test", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
     response = rack_app.(env)
 
-    expect(response.first).to eq 302
+    expect(response[0]).to eq 302
+    expect(response[1]).to eq({"Location"=>"/test", "Content-Type"=>"text/html", "Content-Length"=>"0"})
     expect(runner).to have_received(:call)
   end
 end
