@@ -43,7 +43,7 @@ module TrackyDacks
 
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
-                params.merge("referrer" => referrer)
+                params.merge("referrer" => referrer, "user_agent" => user_agent)
               ) unless skip_tracking
 
               if format == "png"
