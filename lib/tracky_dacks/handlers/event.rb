@@ -12,6 +12,7 @@ module TrackyDacks
           category: params["category"],
           action: params["action"],
           label: params["label"],
+          user_agent: params["user_agent"],
         )
       end
     end

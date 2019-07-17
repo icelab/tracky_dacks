@@ -12,6 +12,7 @@ module TrackyDacks
           action: params["action"],
           network: params["network"],
           target: params["target"],
+          user_agent: params["user_agent"],
         )
       end
     end

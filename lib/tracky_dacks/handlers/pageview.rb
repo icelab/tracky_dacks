@@ -14,7 +14,8 @@ module TrackyDacks
           campaign_medium: params["campaign_medium"],
           campaign_keyword: params["campaign_keyword"],
           campaign_content: params["campaign_content"],
-          campaign_id: params["campaign_id"]
+          campaign_id: params["campaign_id"],
+          user_agent: params["user_agent"],
         )
       end
     end
