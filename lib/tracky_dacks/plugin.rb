@@ -46,20 +46,7 @@ module TrackyDacks
                   false
                 end
 
-              params_options = roda_class.opts[:tracky_dacks][:params_options]
-
-              request_params =
-                if params_options[:enable_truncation]
-                  params.merge(ParamsBuilder.expand_truncated(params))
-                else
-                  params
-                end
-
-              inferred_params_list = Array(params_options[:infer])
-
-              if inferred_params_list.any?
-                request_params = request_params.merge(ParamsBuilder.infer_params(inferred_params_list, request_params))
-              end
+              request_params = ParamsBuilder.build(params, roda_class.opts[:tracky_dacks][:params_options])
 
               additional_params = {"referrer" => referrer, "user_agent" => user_agent}.compact
 

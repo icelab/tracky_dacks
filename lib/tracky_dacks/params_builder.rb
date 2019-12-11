@@ -2,6 +2,16 @@ require "uri"
 
 module TrackyDacks
   class ParamsBuilder
+    def self.build(params, options = {})
+      request_params = options[:enable_truncation] ? params.merge(expand_truncated(params)) : params
+
+      if Array(options[:infer]).any?
+        request_params = request_params.merge(infer_params(Array(options[:infer]), request_params))
+      end
+
+      request_params
+    end
+
     def self.expand_truncated(params)
       {
         "action"           => params["a"],
