@@ -22,12 +22,13 @@ module TrackyDacks
       app.plugin :sinatra_helpers
     end
 
-    def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {}, skip_tracking_if: nil)
+    def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {}, params_options: {}, skip_tracking_if: nil)
       plugin_opts = app.opts[:tracky_dacks] = {}
 
       plugin_opts[:runner] = runner
       plugin_opts[:handlers] = handlers
       plugin_opts[:handler_options] = handler_options
+      plugin_opts[:params_options] = params_options
       plugin_opts[:skip_tracking_if] = skip_tracking_if
     end
 
@@ -45,7 +46,20 @@ module TrackyDacks
                   false
                 end
 
-              request_params = TrackyDacks::ParamsBuilder.new(params).build
+              params_options = roda_class.opts[:tracky_dacks][:params_options]
+
+              request_params =
+                if params_options[:enable_truncation]
+                  params.merge(ParamsBuilder.expand_truncated(params))
+                else
+                  params
+                end
+
+              inferred_params_list = Array(params_options[:infer])
+
+              if inferred_params_list.any?
+                request_params = request_params.merge(ParamsBuilder.infer_params(inferred_params_list, request_params))
+              end
 
               additional_params = {"referrer" => referrer, "user_agent" => user_agent}.compact
 

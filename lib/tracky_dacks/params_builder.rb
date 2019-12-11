@@ -2,23 +2,7 @@ require "uri"
 
 module TrackyDacks
   class ParamsBuilder
-    attr_reader :params
-
-    def initialize(params = {})
-      @params = params
-    end
-
-    def build
-      request_params = params.merge(expanded_params)
-
-      infered_params = infer_params(request_params)
-
-      request_params.merge(infered_params)
-    end
-
-    private
-
-    def expanded_params
+    def self.expand_truncated(params)
       {
         "action"           => params["a"],
         "campaign_content" => params["cc"],
@@ -35,23 +19,20 @@ module TrackyDacks
         "redirect"         => params["r"],
         "target"           => params["t"],
         "title"            => params["ti"],
-      }.compact
+      }.reject { |_,v| v.nil? }
     end
 
-    def infer_params(request_params)
+    def self.infer_params(inferred_params_list, params)
       result = {}
 
-      # Use target for the location param if no location is specified.
-      unless request_params["location"]
-        result["location"] = request_params["target"]
+      if inferred_params_list.include?(:location)
+        result["location"] = params["target"] unless params["location"]
       end
 
-      # Infer path from target unless path is specified.
-      unless request_params["path"]
+      if inferred_params_list.include?(:path)
         begin
-          result["path"] = URI.parse(request_params["target"]).path
-        rescue StandardError => e
-          nil
+          result["path"] = URI.parse(params["target"]).path unless params["path"]
+        rescue StandardError
         end
       end
 

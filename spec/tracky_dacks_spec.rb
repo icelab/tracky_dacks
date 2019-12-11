@@ -30,43 +30,55 @@ RSpec.describe "TrackyDacks" do
     expect(runner).to have_received(:call)
   end
 
-  context "with a truncated path and truncated params" do
-    it "tracks requests passed to a Roda app by expanding truncated path and params" do
-      env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/e", "QUERY_STRING" => "t=https%3A%2F%2Fwww.example.com%2Ftest&a=read&ti=Foobar&c=Podcasts", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
-      response = rack_app.(env)
+  describe "params options" do
+    let(:app) {
+      Class.new(Roda) do
+        plugin :tracky_dacks, handler_options: {tracking_id: "abc"}, params_options: {enable_truncation: true, infer: [:path, :location]}
 
-      expect(response[0]).to eq 302
-      expect(response[1]).to eq({"Location"=>"https://www.example.com/test", "Content-Type"=>"text/html", "Content-Length"=>"0"})
-      expect(runner).to have_received(:call).with(
-        instance_of(TrackyDacks::Handlers::Event),
-        hash_including(
-          "action" => "read",
-          "category" => "Podcasts",
-          "target" => "https://www.example.com/test",
-          "title" => "Foobar",
+        route do |r|
+          r.tracky_dacks_routes
+        end
+      end
+    }
+
+    context "with a truncated params enabled" do
+      it "tracks requests passed to a Roda app by expanding truncated params" do
+        env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/e", "QUERY_STRING" => "t=https%3A%2F%2Fwww.example.com%2Ftest&a=read&ti=Foobar&c=Podcasts", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
+        response = rack_app.(env)
+
+        expect(response[0]).to eq 302
+        expect(response[1]).to eq({"Location"=>"https://www.example.com/test", "Content-Type"=>"text/html", "Content-Length"=>"0"})
+        expect(runner).to have_received(:call).with(
+          instance_of(TrackyDacks::Handlers::Event),
+          hash_including(
+            "action" => "read",
+            "category" => "Podcasts",
+            "target" => "https://www.example.com/test",
+            "title" => "Foobar",
+          )
         )
-      )
+      end
     end
 
-    it "infers location and path from the target param if needed" do
-      env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/s", "QUERY_STRING" => "t=https%3A%2F%2Fwww.example.com%2Ftest", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
-      response = rack_app.(env)
+    context "with param inference for path and location" do
+      it "infers path and location from the target param" do
+        env = {"REQUEST_METHOD" => "GET", "PATH_INFO" => "/s", "QUERY_STRING" => "t=https%3A%2F%2Fwww.example.com%2Ftest", "SCRIPT_NAME" => "", "rack.input" => StringIO.new}
+        response = rack_app.(env)
 
-      expect(response[0]).to eq 302
-      expect(response[1]).to eq({"Location"=>"https://www.example.com/test", "Content-Type"=>"text/html", "Content-Length"=>"0"})
-      expect(runner).to have_received(:call).with(
-        instance_of(TrackyDacks::Handlers::Social),
-        hash_including(
-          "location" => "https://www.example.com/test",
-          "path" => "/test"
+        expect(response[0]).to eq 302
+        expect(response[1]).to eq({"Location"=>"https://www.example.com/test", "Content-Type"=>"text/html", "Content-Length"=>"0"})
+        expect(runner).to have_received(:call).with(
+          instance_of(TrackyDacks::Handlers::Social),
+          hash_including(
+            "location" => "https://www.example.com/test",
+            "path" => "/test"
+          )
         )
-      )
+      end
     end
   end
 
   describe "skip_tracking_if option" do
-    let(:runner) { spy("runner") }
-
     let(:app) {
       Class.new(Roda) do
         plugin :tracky_dacks,
@@ -78,13 +90,6 @@ RSpec.describe "TrackyDacks" do
         end
       end
     }
-
-    let(:rack_app) { app.app }
-
-    before do
-      # Pass a runner spy so we can verify calls
-      app.opts[:tracky_dacks][:runner] = runner
-    end
 
     it "does not track requests matching the skip_tracking_if option" do
       env = {
