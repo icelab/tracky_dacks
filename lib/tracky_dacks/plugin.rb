@@ -3,6 +3,7 @@ require "tracky_dacks/handlers/event"
 require "tracky_dacks/handlers/pageview"
 require "tracky_dacks/handlers/social"
 require "tracky_dacks/job"
+require "tracky_dacks/params_builder"
 
 module TrackyDacks
   module Plugin
@@ -10,8 +11,11 @@ module TrackyDacks
 
     DEFAULT_HANDLERS = {
       event:    Handlers::Event,
+      e:        Handlers::Event,
       pageview: Handlers::Pageview,
+      p:        Handlers::Pageview,
       social:   Handlers::Social,
+      s:        Handlers::Social
     }.freeze
 
     def self.load_dependencies(app, *)
@@ -41,16 +45,20 @@ module TrackyDacks
                   false
                 end
 
+              request_params = TrackyDacks::ParamsBuilder.new(params).build
+
+              additional_params = {"referrer" => referrer, "user_agent" => user_agent}.compact
+
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
-                params.merge("referrer" => referrer, "user_agent" => user_agent)
+                request_params.merge(additional_params)
               ) unless skip_tracking
 
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"
-              elsif params["target"]
-                status_code = Integer(params.fetch("redirect", 302))
-                redirect params["target"], status_code
+              elsif request_params["target"]
+                status_code = Integer(request_params.fetch("redirect", 302))
+                redirect request_params["target"], status_code
               else
                 halt [200, {
                   "Content-Type" => "text/html",
