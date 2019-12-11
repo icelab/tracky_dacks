@@ -48,7 +48,7 @@ module TrackyDacks
 
               request_params = ParamsBuilder.build(params, roda_class.opts[:tracky_dacks][:params_options])
 
-              additional_params = {"referrer" => referrer, "user_agent" => user_agent}.compact
+              additional_params = {"referrer" => referrer, "user_agent" => user_agent}
 
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
