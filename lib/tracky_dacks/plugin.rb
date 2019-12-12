@@ -3,6 +3,7 @@ require "tracky_dacks/handlers/event"
 require "tracky_dacks/handlers/pageview"
 require "tracky_dacks/handlers/social"
 require "tracky_dacks/job"
+require "tracky_dacks/params_builder"
 
 module TrackyDacks
   module Plugin
@@ -10,20 +11,24 @@ module TrackyDacks
 
     DEFAULT_HANDLERS = {
       event:    Handlers::Event,
+      e:        Handlers::Event,
       pageview: Handlers::Pageview,
+      p:        Handlers::Pageview,
       social:   Handlers::Social,
+      s:        Handlers::Social
     }.freeze
 
     def self.load_dependencies(app, *)
       app.plugin :sinatra_helpers
     end
 
-    def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {}, skip_tracking_if: nil)
+    def self.configure(app, runner: Job.method(:perform_async), handlers: DEFAULT_HANDLERS, handler_options: {}, params_options: {}, skip_tracking_if: nil)
       plugin_opts = app.opts[:tracky_dacks] = {}
 
       plugin_opts[:runner] = runner
       plugin_opts[:handlers] = handlers
       plugin_opts[:handler_options] = handler_options
+      plugin_opts[:params_options] = params_options
       plugin_opts[:skip_tracking_if] = skip_tracking_if
     end
 
@@ -41,16 +46,20 @@ module TrackyDacks
                   false
                 end
 
+              request_params = ParamsBuilder.build(params, roda_class.opts[:tracky_dacks][:params_options])
+
+              additional_params = {"referrer" => referrer, "user_agent" => user_agent}
+
               roda_class.opts[:tracky_dacks][:runner].(
                 handler,
-                params.merge("referrer" => referrer, "user_agent" => user_agent)
+                request_params.merge(additional_params)
               ) unless skip_tracking
 
               if format == "png"
                 send_file IMAGE_PATH, disposition: "inline"
-              elsif params["target"]
-                status_code = Integer(params.fetch("redirect", 302))
-                redirect params["target"], status_code
+              elsif request_params["target"]
+                status_code = Integer(request_params.fetch("redirect", 302))
+                redirect request_params["target"], status_code
               else
                 halt [200, {
                   "Content-Type" => "text/html",
