@@ -4,7 +4,7 @@ module TrackyDacks
   module Handlers
     class Pageview < GA
       def call(params = {})
-        tracker.pageview(
+        hit = tracker.build_pageview(
           document_location: params["location"],
           document_title: params["title"],
           document_path: params["path"],
@@ -17,6 +17,9 @@ module TrackyDacks
           campaign_id: params["campaign_id"],
           user_agent: params["user_agent"],
         )
+        add_custom_dimensions(hit, params)
+        add_custom_metrics(hit, params)
+        hit.track!
       end
     end
   end
